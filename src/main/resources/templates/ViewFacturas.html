@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{Layout}">
+    <head>
+        <title>Index</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            .table-container {
+                overflow-x: auto;
+                margin: 20px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                min-width: 1200px;
+            }
+
+            th, td {
+                padding: 8px 12px;
+                border: 1px solid #999;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            thead {
+                background-color: #f2f2f2;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            tbody {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            .pagination {
+                display: flex;
+                list-style: none;
+                gap: 6px;
+                padding: 0;
+            }
+
+            .page-item a {
+                padding: 6px 12px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                text-decoration: none;
+                color: #007bff;
+            }
+
+            .page-item.active a {
+                background-color: #007bff;
+                color: white;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body layout:fragment="body">
+        <div class="table-container">
+            <table id="tablaFacturas" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Fecha</th>
+                        <th>Contrato</th>
+                        <th>Nombre</th>
+                        <th>NodoRecepcion</th>
+                        <th>Descripcion</th>
+                        <th>NodoEntrega</th>
+                        <th>Descripcion</th>
+                        <th>ZonaExtraccion</th>
+                        <th>ZonaInyeccion</th>
+                        <th>Cantidad Nominada Recepción</th>
+                        <th>Cantidad Asignada Recepción</th>
+                        <th>Cantidad Nominada Entrega</th>
+                        <th>Cantidad Asignada Entrega</th>
+                        <th>Tarifa Exceso Firme</th>
+                        <th>Tarifa Uso Interrumpible</th>
+                        <th>Gas Exceso</th>
+                        <th>Cargo Uso</th>
+                        <th>Cargo Gas Exceso</th>
+                        <th>Total Factura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="factura : ${listaFacturas}">
+                        <td th:text="${factura.IdFactura}"></td>
+                        <td th:text="${#dates.format(factura.Fecha, 'dd-MM-yyyy')}"></td>
+                        <td th:text="${factura.Contrato.ClaveContrato}"></td>
+                        <td th:text="${factura.Contrato.Usuario.Nombre}"></td>
+                        <td th:text="${factura.Contrato.NodoComercialRecepcion.ClaveNodo}"></td>
+                        <td th:text="${factura.Contrato.NodoComercialRecepcion.Descripcion}"></td>
+                        <td th:text="${factura.Contrato.NodoComercialEntrega.ClaveNodo}"></td>
+                        <td th:text="${factura.Contrato.NodoComercialEntrega.Descripcion}"></td>
+                        <td th:text="${factura.Contrato.NodoComercialRecepcion.Zona.ZonaClave}"></td>
+                        <td th:text="${factura.Contrato.NodoComercialEntrega.Zona.ZonaClave}"></td>
+                        <td th:text="${factura.NominadaRecepcion}"></td>
+                        <td th:text="${factura.AsignadaRecepcion}"></td>
+                        <td th:text="${factura.NominadaEntrega}"></td>
+                        <td th:text="${factura.AsignadaEntrega}"></td>
+                        <td th:text="${factura.ExcesoFirme}"></td>
+                        <td th:text="${factura.UsoInterrumpible}"></td>
+                        <td th:text="${factura.GasExceso}"></td>
+                        <td th:text="${factura.CargoUso}"></td>
+                        <td th:text="${factura.CargoGasExceso}"></td>
+                        <td th:text="${factura.TotalFactura}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            <ul id="pagination" class="pagination"></ul>
+        </div>
+        <script>
+            const rowsPerPage = 100;
+            const maxButtons = 10; // cantidad de botones visibles a la vez
+
+            $(document).ready(function () {
+                const $rows = $('#tablaFacturas tbody tr');
+                const totalRows = $rows.length;
+                const totalPages = Math.ceil(totalRows / rowsPerPage);
+                let currentPage = 0;
+
+                function mostrarPagina(pagina) {
+                    const inicio = pagina * rowsPerPage;
+                    const fin = inicio + rowsPerPage;
+                    $rows.hide().slice(inicio, fin).show();
+                    currentPage = pagina;
+                    generarControles();
+                }
+
+                function generarControles() {
+                    const $pagination = $('#pagination');
+                    $pagination.empty();
+
+                    const currentBlock = Math.floor(currentPage / maxButtons);
+                    const startPage = currentBlock * maxButtons;
+                    const endPage = Math.min(startPage + maxButtons, totalPages);
+
+                    // Botón anterior
+                    if (startPage > 0) {
+                        $pagination.append(`
+                    <li class="page-item">
+                        <a class="page-link" href="#" data-page="${startPage - 1}">&laquo;</a>
+                    </li>
+                `);
+                    }
+
+                    // Botones de página
+                    for (let i = startPage; i < endPage; i++) {
+                        $pagination.append(`
+                    <li class="page-item ${i === currentPage ? 'active' : ''}" data-page="${i}">
+                        <a class="page-link" href="#">${i + 1}</a>
+                    </li>
+                `);
+                    }
+
+                    // Botón siguiente
+                    if (endPage < totalPages) {
+                        $pagination.append(`
+                    <li class="page-item">
+                        <a class="page-link" href="#" data-page="${endPage}">&raquo;</a>
+                    </li>
+                `);
+                    }
+                }
+
+                // Evento de clic en paginación
+                $('#pagination').on('click', 'a', function (e) {
+                    e.preventDefault();
+                    const pagina = parseInt($(this).parent().attr('data-page'));
+                    if (!isNaN(pagina)) {
+                        mostrarPagina(pagina);
+                    }
+                });
+
+                // Mostrar primera página
+                mostrarPagina(0);
+            });
+        </script>
+
+    </body>
+</html>
