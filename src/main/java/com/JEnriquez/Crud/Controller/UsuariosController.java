@@ -1,9 +1,7 @@
 package com.JEnriquez.Crud.Controller;
 
-import com.JEnriquez.Crud.ML.Factura;
 import com.JEnriquez.Crud.ML.Result;
-import java.util.Comparator;
-import java.util.stream.Collectors;
+import com.JEnriquez.Crud.ML.Usuario;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -16,32 +14,29 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 @Controller
-@RequestMapping("/facturas")
-public class FacturasController {
+@RequestMapping("/usuario")
+public class UsuariosController {
 
     private RestTemplate restTemplate = new RestTemplate();
     private String urlBase = "http://localhost:8081/";
 
     @GetMapping
-    public String GetAll(Model model) {
+    public String GetAllUsuariosContratos(Model model) {
         try {
-
-            ResponseEntity<Result<Factura>> response = restTemplate.exchange(urlBase + "factura",
+            ResponseEntity<Result<Usuario>> response = restTemplate.exchange(urlBase + "usuario",
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
-                    new ParameterizedTypeReference<Result<Factura>>() {
+                    new ParameterizedTypeReference<Result<Usuario>>() {
             });
+
             Result result = new Result();
+            result = response.getBody();
 
-            result.objects = response.getBody().objects.stream()
-                    .sorted(Comparator.comparing(f -> f.getIdFactura()))
-                    .collect(Collectors.toList());
-
-            model.addAttribute("listaFacturas", result.objects);
+            model.addAttribute("listaUsuarios", result.objects);
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
         }
-        return "ViewFacturas";
+        return "ViewUsuarios";
     }
 }

@@ -1,9 +1,11 @@
 package com.JEnriquez.Crud.ML;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter@Setter
+@Getter
+@Setter
 public class Contrato {
 
     private int IdContrato;
@@ -15,4 +17,6 @@ public class Contrato {
     public NodoComercialEntrega NodoComercialEntrega;
 
     private String ClaveContrato;
+
+    private List<Factura> facturas;
 }
