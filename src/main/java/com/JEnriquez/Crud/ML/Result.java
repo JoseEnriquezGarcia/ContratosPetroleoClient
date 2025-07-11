@@ -9,4 +9,5 @@ public class Result<T> {
     public Exception ex;
     public T object;
     public List<T> objects;
+    public int currentPage;
 }

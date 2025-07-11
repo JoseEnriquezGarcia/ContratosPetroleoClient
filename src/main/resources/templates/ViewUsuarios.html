@@ -2,7 +2,7 @@
 <html
     layout:decorate="~{Layout}">
     <head>
-        <title>Usuarios</title>
+        <title>Provedores</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -15,7 +15,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th style="width: 10%;">No</th>
-                        <th style="width: 30%;">Usuario</th>
+                        <th style="width: 30%;">Proveedor</th>
                         <th style="width: 60%;">Contratos</th>
                     </tr>
                 </thead>
@@ -24,11 +24,11 @@
                         <td th:text="${usuario.IdUsuario}"></td>
                         <td th:text="${usuario.Nombre}"></td>
                         <td>
-                            <div class="accordion" id="accordionExample">
+                            <div class="accordion accordion-flush" id="accordionExample">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapse' + ${usuario.IdUsuario}" aria-expanded="false" aria-controls="collapseOne">
-                                            <i class="bi bi-eye-fill"></i>  Visualizar contratos
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapse' + ${usuario.IdUsuario}" aria-expanded="false" aria-controls="collapseOne">
+                                            <i class="bi bi-file-earmark-fill me-2"></i>Contratos del proveedor
                                         </button>
                                     </h2>
                                     <table th:id="'collapse' + ${usuario.IdUsuario}" class="table table-sm w-100 mb-0 accordion-collapse collapse" data-bs-parent="#accordionExample">

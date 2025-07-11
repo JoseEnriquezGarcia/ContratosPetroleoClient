@@ -8,7 +8,7 @@
         <style>
             .table-container {
                 overflow-x: auto;
-                margin: 20px;
+                margin: 21px;
                 border: 1px solid #ccc;
                 border-radius: 8px;
             }
@@ -63,29 +63,90 @@
             .modal-dialog {
                 max-width: 600px; /* Tamaño cómodo del modal */
             }
+            .container {
+                padding: 40px;
+            }
+
+            .search-box {
+                display: inline-block;
+                width: 100%;
+                border-radius: 3px;
+                padding: 4px 55px 4px 15px;
+                position: relative;
+                background: #fff;
+                border: 1px solid #ddd;
+                -webkit-transition: all 200ms ease-in-out;
+                -moz-transition: all 200ms ease-in-out;
+                transition: all 200ms ease-in-out;
+            }
+            .search-box.hovered, .search-box:hover, .search-box:active {
+                border: 1px solid #aaa;
+            }
+            .search-box input[type=text] {
+                border: none;
+                box-shadow: none;
+                display: inline-block;
+                padding: 0;
+                background: transparent;
+            }
+            .search-box input[type=text]:hover, .search-box input[type=text]:focus, .search-box input[type=text]:active {
+                box-shadow: none;
+            }
+            .search-box .search-btn {
+                position: absolute;
+                right: 2px;
+                top: 2px;
+                color: #aaa;
+                border-radius: 3px;
+                font-size: 21px;
+                padding: 5px 10px 1px;
+                -webkit-transition: all 200ms ease-in-out;
+                -moz-transition: all 200ms ease-in-out;
+                transition: all 200ms ease-in-out;
+            }
+            .search-box .search-btn:hover {
+                color: #fff;
+                background-color: #8FBE00;
+            }
         </style>
     </head>
     <body layout:fragment="body">
+        <form class="form mt-5 me-5" method="POST" th:action="@{/facturas/busqueda}" th:object="${facturaBusqueda}">
+            <div class="row">
+                <div class="col-2">
+                    <select id="inputContratos" class="form-select" th:field="*{Contrato.ClaveContrato}">
+                        <option value="0" selected>Contrato a buscar</option>
+                        <option th:each="contrato : ${listaContratos}" th:text="${contrato.ClaveContrato}" th:value="${contrato.ClaveContrato}"></option>
+                    </select>
+                    <select id="inputUsuarios" class="form-select" th:field="*{Contrato.Usuario.Nombre}">
+                        <option value="0" selected>Usuario a buscar</option>
+                        <option th:each="usuario : ${listaUsuarios}" th:text="${usuario.Nombre}" th:value="${usuario.Nombre}"></option>
+                    </select>
+                </div>
+
+                <div class="col-2">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
+            </div>
+        </form>
         <div class="table-container">
             <table id="tablaFacturas" class="table table-striped">
                 <thead class="thead">
                     <tr>
-                        <th class="th">Id</th>
                         <th class="th">Fecha</th>
                         <th class="th">Contrato</th>
                         <th class="th">Nombre</th>
-                        <th class="th">NodoRecepcion</th>
-                        <th class="th">Descripcion</th>
-                        <th class="th">NodoEntrega</th>
-                        <th class="th">Descripcion</th>
-                        <th class="th">ZonaExtraccion</th>
-                        <th class="th">ZonaInyeccion</th>
-                        <th class="th">Detalles Cant.</th>
+                        <th class="th">Nodo Recepción</th>
+                        <th class="th">Descripción</th>
+                        <th class="th">Nodo Entrega</th>
+                        <th class="th">Descripción</th>
+                        <th class="th">Zona Extracción</th>
+                        <th class="th">Zona Inyección</th>
+                        <th class="th">Detalles Cantidad</th>
                     </tr>
                 </thead>
                 <tbody class="tbody">
                     <tr th:each="factura : ${listaFacturas}">
-                        <td class="td" th:text="${factura.IdFactura}" id="facturaId"></td>
                         <td class="td" th:text="${#dates.format(factura.Fecha, 'dd-MM-yyyy')}"></td>
                         <td class="td" th:text="${factura.Contrato.ClaveContrato}"></td>
                         <td class="td" th:text="${factura.Contrato.Usuario.Nombre}"></td>
@@ -100,6 +161,20 @@
                 </tbody>
             </table>
         </div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" th:href="@{/facturas(currentPage=${numeroPagina-1})}" th:if="${numeroPagina > 0}" aria-label="Previous">
+                        <span aria-hidden="true">Anterior</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" th:href="@{/facturas(currentPage=${numeroPagina+1})}" th:if="${numeroPagina < 66}" aria-label="Next">
+                        <span aria-hidden="true">Siguiente</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
         <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -137,7 +212,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-<!--                        <button type="button" class="btn btn-primary">Guardar cambios</button>-->
+                        <!--                        <button type="button" class="btn btn-primary">Guardar cambios</button>-->
                     </div>
                 </div>
             </div>
@@ -159,7 +234,7 @@
                     url: 'http://localhost:8081/factura/byId/' + Id,
                     datatype: 'JSON',
                     success: function (data, textStatus, jqXHR) {
-//                        $("#tituloFactura").append("<h1 class='modal-title fs-5' id='tituloFactura'> " + data.object.fecha + "</h1>");
+                        //                        $("#tituloFactura").append("<h1 class='modal-title fs-5' id='tituloFactura'> " + data.object.fecha + "</h1>");
                         $("#NominadaRecepcion").text(data.object.nominadaRecepcion);
                         $("#AsignadaRecepcion").text(data.object.asignadaRecepcion);
                         $("#NominadaEntrega").text(data.object.nominadaEntrega);
