@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Contratos</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            .table-container {
+                overflow-x: auto;
+                margin: 21px;
+                /*                border: 1px solid #ccc;*/
+                border-radius: 8px;
+            }
+
+            .table {
+                border-collapse: collapse;
+                width: 20%;
+                min-width: 100px;
+            }
+
+            .th, .td {
+                padding: 8px 12px;
+                border: 1px solid #999;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            .thead {
+                background-color: #f2f2f2;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            .tbody {
+                max-height: 200px;
+                overflow-y: auto;
+            }
+        </style>
+    </head>
+    <body layout:fragment="body">
+        <div class="table-container">
+            <table id="tablaFacturas" class="table table-striped">
+                <thead class="thead">
+                    <tr>
+                        <th class="th">Fecha</th>
+                        <th class="th">Contrato</th>
+                        <th class="th">Nombre</th>
+                        <th class="th">Nodo Recepción</th>
+                        <th class="th">Descripción</th>
+                        <th class="th">Nodo Entrega</th>
+                        <th class="th">Descripción</th>
+                        <th class="th">Zona Extracción</th>
+                        <th class="th">Zona Inyección</th>
+                        <th class="th">Detalles Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody class="tbody">
+                    <tr th:each="contrato : ${listaContratos}">
+                        <td class="td" th:text="${#dates.format(factura.Fecha, 'dd-MM-yyyy')}"></td>
+                        <td class="td" th:text="${factura.Contrato.ClaveContrato}"></td>
+                        <td class="td" th:text="${factura.Contrato.Usuario.Nombre}"></td>
+                        <td class="td" th:text="${factura.Contrato.NodoComercialRecepcion.ClaveNodo}"></td>
+                        <td class="td" th:text="${factura.Contrato.NodoComercialRecepcion.Descripcion}"></td>
+                        <td class="td" th:text="${factura.Contrato.NodoComercialEntrega.ClaveNodo}"></td>
+                        <td class="td" th:text="${factura.Contrato.NodoComercialEntrega.Descripcion}"></td>
+                        <td class="td" th:text="${factura.Contrato.NodoComercialRecepcion.Zona.ZonaClave}"></td>
+                        <td class="td" th:text="${factura.Contrato.NodoComercialEntrega.Zona.ZonaClave}"></td>
+                        <td class="td text-center"><a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="DetalleFactura(this);" th:data-id="${factura.IdFactura}"><i class="bi bi-eye-fill"></i></a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
