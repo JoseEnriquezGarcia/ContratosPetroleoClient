@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -107,13 +108,18 @@ public class FacturasController {
         return "ViewFacturas";
     }
 
-    public Collection asas() {
-        return null;
-    }
-
     @PostMapping("/busqueda")
     public String BusquedaDinamica(@ModelAttribute Factura factura, Model model) {
         try {
+            int totalPaginas = 67;
+            int paginaActual = 0;
+
+            int desde = Math.max(0, paginaActual - 1);
+            int hasta = Math.min(desde + 4, totalPaginas - 1);
+            if (hasta - desde < 4) {
+                desde = Math.max(0, hasta - 4);
+            }
+            List<Integer> paginas = IntStream.rangeClosed(desde, hasta).boxed().collect(Collectors.toList());
             Factura facturaBusqueda = new Factura();
             facturaBusqueda.Contrato = new Contrato();
             facturaBusqueda.Contrato.Usuario = new Usuario();
@@ -149,26 +155,47 @@ public class FacturasController {
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
 
-            result.objects = response.getBody().objects;
+            
 
-            model.addAttribute("facturaBusqueda", facturaBusqueda);
-            model.addAttribute("mostrarPaginacion", false);
-            model.addAttribute("listaFacturas", result.objects);
-            model.addAttribute("listaContratos", responseContrato.getBody().objects);
-            model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
-            model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
-            model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
-            return "ViewFacturas";
+            if (response.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204))) {
+                model.addAttribute("facturaBusqueda", facturaBusqueda);
+                model.addAttribute("numeroPagina", paginaActual);
+                model.addAttribute("totalPaginas", totalPaginas);
+                model.addAttribute("paginas", paginas);
+                model.addAttribute("mostrarMensaje", true);
+                model.addAttribute("mostrarPaginacion", false);
+                model.addAttribute("listaFacturas", result);
+                model.addAttribute("listaContratos", responseContrato.getBody().objects);
+                model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
+                model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
+                model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+            } else if (response.getStatusCode().is2xxSuccessful()) {
+                result.objects = response.getBody().objects;
+                model.addAttribute("facturaBusqueda", facturaBusqueda);
+                model.addAttribute("numeroPagina", paginaActual);
+                model.addAttribute("totalPaginas", totalPaginas);
+                model.addAttribute("paginas", paginas);
+                model.addAttribute("mostrarMensaje", false);
+                model.addAttribute("mostrarPaginacion", false);
+                model.addAttribute("listaFacturas", result.objects);
+                model.addAttribute("listaContratos", responseContrato.getBody().objects);
+                model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
+                model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
+                model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+            }
+
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
             return "ErrorPage";
         }
+
+        return "ViewFacturas";
     }
-    
+
     @GetMapping("/byFecha")
-    public String BusquedaByFecha(@RequestParam String Desde, @RequestParam String Hasta, Model model){
-        
+    public String BusquedaByFecha(@RequestParam String Desde, @RequestParam String Hasta, Model model) {
+
         try {
             Factura facturaBusqueda = new Factura();
             facturaBusqueda.Contrato = new Contrato();
@@ -213,13 +240,14 @@ public class FacturasController {
             model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
             model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
             model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
-            
-            return "ViewFacturas";
+
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
             return "ErrorPage";
         }
+
+        return "ViewFacturas";
     }
 
 }

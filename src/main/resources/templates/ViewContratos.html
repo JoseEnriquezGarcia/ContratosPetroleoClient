@@ -1,75 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{Layout}">
     <head>
         <title>Contratos</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <style>
             .table-container {
                 overflow-x: auto;
                 margin: 21px;
-                /*                border: 1px solid #ccc;*/
                 border-radius: 8px;
             }
 
             .table {
                 border-collapse: collapse;
-                width: 20%;
-                min-width: 100px;
+                width: 100%;
+                table-layout: fixed; /* <-- importante: columnas de ancho fijo */
             }
 
             .th, .td {
                 padding: 8px 12px;
                 border: 1px solid #999;
                 text-align: center;
-                white-space: nowrap;
+                white-space: nowrap; /* evita saltos de línea */
+                overflow: hidden; /* oculta el desbordamiento */
+                text-overflow: ellipsis; /* pone "..." si el texto es muy largo */
+            }
+            .container {
+                padding: 40px;
             }
 
-            .thead {
-                background-color: #f2f2f2;
-                position: sticky;
-                top: 0;
-                z-index: 1;
+            .filter-container {
+                display: none;
             }
 
-            .tbody {
-                max-height: 200px;
-                overflow-y: auto;
+            .filter-container.active {
+                display: block;
+            }
+
+            .btn-toggle-filters {
+                margin-bottom: 15px;
+                color: #A67C00;
+            }
+
+            .container {
+                margin-top: 30px;
+            }
+
+            .col-md-3, .col-md-1 {
+                padding-right: 15px;
+                padding-left: 15px;
+            }
+
+            .col-md-1.mt-3 {
+                text-align: center;
             }
         </style>
     </head>
     <body layout:fragment="body">
+        <div class="container mt-5">
+            <button type="button" class="btn btn-toggle-filters" onclick="toggleFilters()">
+                <i class="bi bi-filter"></i> Buscar Contratos
+            </button>
+            <div class="filter-container animate__animated animate__zoomIn" id="filterContainer">
+                <!--                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" onclick="cerrarFiltro();"></button>-->
+                <form class="card p-4 shadow-sm mb-4" method="POST" th:action="@{/contratos/busqueda}" id="formulario" th:object="${contratoBusqueda}">
+                    <h5 class="mb-3">Buscar por contrato, usuario o nodo</h5>
+                    <div class="row g-3 align-items-end">
+                        <!-- Contrato -->
+                        <div class="col-md-2">
+                            <label for="inputContratos" class="form-label">Contrato</label>
+                            <select id="inputContratos" class="form-select js-example-basic-single w-100" th:field="*{ClaveContrato}">
+                                <option value="0" selected>Selecciona</option>
+                                <option th:each="contrato : ${listaContratos}"
+                                        th:text="${contrato.ClaveContrato}"
+                                        th:value="${contrato.ClaveContrato}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Usuario -->
+                        <div class="col-md-3">
+                            <label for="inputUsuarios" class="form-label">Usuario</label>
+                            <select id="inputUsuarios" class="form-select js-example-basic-single" th:field="*{Usuario.Nombre}">
+                                <option value="0" selected>Selecciona</option>
+                                <option th:each="usuario : ${listaUsuarios}"
+                                        th:text="${usuario.Nombre}"
+                                        th:value="${usuario.Nombre}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Nodo Recepción -->
+                        <div class="col-md-3">
+                            <label for="inputNodoRecepcion" class="form-label">Nodo Recepción</label>
+                            <select id="inputNodoRecepcion" class="form-select js-example-basic-single" th:field="*{NodoComercialRecepcion.ClaveNodo}">
+                                <option value="0" selected>Selecciona</option>
+                                <option th:each="nodoRecepcion : ${listaNodoRecepcion}"
+                                        th:text="${nodoRecepcion.ClaveNodo}"
+                                        th:value="${nodoRecepcion.ClaveNodo}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Nodo Entrega -->
+                        <div class="col-md-3">
+                            <label for="inputNodoEntrega" class="form-label">Nodo Entrega</label>
+                            <select id="inputNodoEntrega" class="form-select js-example-basic-single" th:field="*{NodoComercialEntrega.ClaveNodo}">
+                                <option value="0" selected>Selecciona</option>
+                                <option th:each="nodoEntrega : ${listaNodoEntrega}"
+                                        th:text="${nodoEntrega.ClaveNodo}"
+                                        th:value="${nodoEntrega.ClaveNodo}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Botón Buscar -->
+                        <div class="col-md-12 text-end">
+                            <button type="submit" class="btn btn-primary mt-3">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="table-container">
             <table id="tablaFacturas" class="table table-striped">
                 <thead class="thead">
                     <tr>
-                        <th class="th">Fecha</th>
                         <th class="th">Contrato</th>
-                        <th class="th">Nombre</th>
+                        <th class="th">Usuario</th>
                         <th class="th">Nodo Recepción</th>
                         <th class="th">Descripción</th>
                         <th class="th">Nodo Entrega</th>
                         <th class="th">Descripción</th>
                         <th class="th">Zona Extracción</th>
                         <th class="th">Zona Inyección</th>
-                        <th class="th">Detalles Cantidad</th>
                     </tr>
                 </thead>
                 <tbody class="tbody">
                     <tr th:each="contrato : ${listaContratos}">
-                        <td class="td" th:text="${#dates.format(factura.Fecha, 'dd-MM-yyyy')}"></td>
-                        <td class="td" th:text="${factura.Contrato.ClaveContrato}"></td>
-                        <td class="td" th:text="${factura.Contrato.Usuario.Nombre}"></td>
-                        <td class="td" th:text="${factura.Contrato.NodoComercialRecepcion.ClaveNodo}"></td>
-                        <td class="td" th:text="${factura.Contrato.NodoComercialRecepcion.Descripcion}"></td>
-                        <td class="td" th:text="${factura.Contrato.NodoComercialEntrega.ClaveNodo}"></td>
-                        <td class="td" th:text="${factura.Contrato.NodoComercialEntrega.Descripcion}"></td>
-                        <td class="td" th:text="${factura.Contrato.NodoComercialRecepcion.Zona.ZonaClave}"></td>
-                        <td class="td" th:text="${factura.Contrato.NodoComercialEntrega.Zona.ZonaClave}"></td>
-                        <td class="td text-center"><a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="DetalleFactura(this);" th:data-id="${factura.IdFactura}"><i class="bi bi-eye-fill"></i></a></td>
+                        <td class="td" th:text="${contrato.ClaveContrato}"></td>
+                        <td class="td" th:text="${contrato.Usuario.Nombre}"></td>
+                        <td class="td" th:text="${contrato.NodoComercialRecepcion.ClaveNodo}"></td>
+                        <td class="td" th:text="${contrato.NodoComercialRecepcion.Descripcion}"></td>
+                        <td class="td" th:text="${contrato.NodoComercialEntrega.ClaveNodo}"></td>
+                        <td class="td" th:text="${contrato.NodoComercialEntrega.Descripcion}"></td>
+                        <td class="td" th:text="${contrato.NodoComercialRecepcion.Zona.ZonaClave}"></td>
+                        <td class="td" th:text="${contrato.NodoComercialEntrega.Zona.ZonaClave}"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        <script>
+            function toggleFilters() {
+                var filterContainer = document.getElementById("filterContainer");
+                filterContainer.classList.toggle("active");
+            }
+            
+            $(document).ready(function(){
+               $("#formulario").submit(function (event){
+                  event.preventDefault();
+                  var datosFormulario = $(this).serialize();
+                  
+                  $.ajax({
+                     type: "POST",
+                     url: "http://localhost:8081/factura/byId/",
+                     data: datosFormulario,
+                     dataType: 'JSON',
+                     success: function (respuesta) {
+                        alert(respuesta.mensaje);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                  });
+               });
+            });
+        </script>
     </body>
 </html>
