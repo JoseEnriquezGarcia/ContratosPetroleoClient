@@ -22,8 +22,8 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/contratos")
 public class ContratosController {
 
-    private RestTemplate restTemplate = new RestTemplate();
-    private String urlBase = "http://localhost:8081/";
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String URL_BASE = "http://localhost:8081/";
 
     @GetMapping
     public String GetContratosFactura(Model model) {
@@ -32,14 +32,36 @@ public class ContratosController {
             contratoBusqueda.Usuario = new Usuario();
             contratoBusqueda.NodoComercialRecepcion = new NodoComercialRecepcion();
             contratoBusqueda.NodoComercialEntrega = new NodoComercialEntrega();
-            
-            ResponseEntity<Result<Contrato>> response = restTemplate.exchange(urlBase + "contrato",
+
+            ResponseEntity<Result<Contrato>> response = restTemplate.exchange(URL_BASE + "contrato",
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<Contrato>>() {
             });
+
+            ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(URL_BASE + "usuario",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Usuario>>() {
+            });
+
+            ResponseEntity<Result<NodoComercialRecepcion>> responseNodoRecepcion = restTemplate.exchange(URL_BASE + "nodoRecepcion",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<NodoComercialRecepcion>>() {
+            });
+
+            ResponseEntity<Result<NodoComercialEntrega>> responseNodoEntrega = restTemplate.exchange(URL_BASE + "nodoEntrega",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
+            });
+
             model.addAttribute("contratoBusqueda", contratoBusqueda);
             model.addAttribute("listaContratos", response.getBody().objects);
+            model.addAttribute("listaUsuarios", responseUsuario.getBody().objects);
+            model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
+            model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
@@ -47,9 +69,48 @@ public class ContratosController {
         }
         return "ViewContratos";
     }
-    
-//    @PostMapping("/busqueda")
-//    public String Busqueda(@ModelAttribute Contrato contrato, Model model){
-//        
-//    }
+
+    @PostMapping("/busqueda")
+    public String Busqueda(@ModelAttribute Contrato contrato, Model model) {
+        try {
+            Contrato contratoBusqueda = new Contrato();
+            contratoBusqueda.Usuario = new Usuario();
+            contratoBusqueda.NodoComercialRecepcion = new NodoComercialRecepcion();
+            contratoBusqueda.NodoComercialEntrega = new NodoComercialEntrega();
+
+            ResponseEntity<Result<Contrato>> response = restTemplate.exchange(URL_BASE + "/busquedaContratoService",
+                    HttpMethod.GET,
+                    new HttpEntity<>(contrato),
+                    new ParameterizedTypeReference<Result<Contrato>>() {
+            });
+            ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(URL_BASE + "usuario",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Usuario>>() {
+            });
+
+            ResponseEntity<Result<NodoComercialRecepcion>> responseNodoRecepcion = restTemplate.exchange(URL_BASE + "nodoRecepcion",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<NodoComercialRecepcion>>() {
+            });
+
+            ResponseEntity<Result<NodoComercialEntrega>> responseNodoEntrega = restTemplate.exchange(URL_BASE + "nodoEntrega",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
+            });
+
+            model.addAttribute("contratoBusqueda", contratoBusqueda);
+            model.addAttribute("listaContratos", response.getBody().objects);
+            model.addAttribute("listaUsuarios", responseUsuario.getBody().objects);
+            model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
+            model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+        } catch (HttpStatusCodeException ex) {
+            model.addAttribute("status", ex.getStatusCode());
+            model.addAttribute("message", ex.getMessage());
+            return "ErrorPage";
+        }
+        return "ViewContratos";
+    }
 }

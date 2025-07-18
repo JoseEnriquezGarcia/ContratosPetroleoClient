@@ -131,6 +131,7 @@
         </style>
     </head>
     <body layout:fragment="body">
+        <h1 class="animate__animated animate__fadeInDown text-center mt-5">Facturas</h1>
         <div class="container mt-5">
             <button type="button" class="btn btn-toggle-filters" onclick="toggleFilters()">
                 <i class="bi bi-filter"></i> Buscar Facturas
@@ -140,7 +141,7 @@
             </button>
             <!-- Filtros por contrato, usuario, nodo -->
             <div class="filter-container animate__animated animate__zoomIn" id="filterContainer">
-<!--                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" onclick="cerrarFiltro();"></button>-->
+                <!--                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" onclick="cerrarFiltro();"></button>-->
                 <form class="card p-4 shadow-sm mb-4" method="POST" th:action="@{/facturas/busqueda}" th:object="${facturaBusqueda}">
                     <h5 class="mb-3">Buscar por contrato, usuario o nodo</h5>
                     <div class="row g-3 align-items-end">
@@ -414,7 +415,7 @@
                     placeholder: "Selecciona",
                     allowClear: true
                 });
-            })
+            });
 
             $(document).ready(function () {
                 if ($('#pagination-container').length) {

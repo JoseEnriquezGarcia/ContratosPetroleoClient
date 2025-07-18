@@ -61,6 +61,7 @@
         </style>
     </head>
     <body layout:fragment="body">
+        <h1 class="animate__animated animate__fadeInDown text-center mt-5">Contratos</h1>
         <div class="container mt-5">
             <button type="button" class="btn btn-toggle-filters" onclick="toggleFilters()">
                 <i class="bi bi-filter"></i> Buscar Contratos
@@ -118,6 +119,29 @@
                             </select>
                         </div>
 
+                        <!-- Zona Inyeccion -->
+                        <div class="col-md-3">
+                            <label for="inputZonaExtraccion" class="form-label">Zona Inyeccion</label>
+                            <select id="inputZonaExtraccion" class="form-select js-example-basic-single" th:field="*{NodoComercialEntrega.ClaveNodo.Zona.ZonaClave}">
+                                <option value="0" selected>Selecciona</option>
+                                <option th:each="nodoRecepcion : ${listaNodoRecepcion}"
+                                        th:text="${nodoRecepcion.ClaveNodo.Zona.ZonaClave}"
+                                        th:value="${nodoRecepcion.ClaveNodo.Zona.ZonaClave}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Zona Extraccion -->
+                        <div class="col-md-3">
+                            <label for="inputZonaInyeccion" class="form-label">Zona Extraccion</label>
+                            <select id="inputZonaInyeccion" class="form-select js-example-basic-single" th:field="*{NodoComercialEntrega.ClaveNodo.Zona.ZonaClave}">
+                                <option value="0" selected>Selecciona</option>
+                                <option th:each="nodoRecepcion : ${listaNodoEntrega}"
+                                        th:text="${nodoRecepcion.ClaveNodo.Zona.ZonaClave}"
+                                        th:value="${nodoEntrega.ClaveNodo.Zona.ZonaClave}">
+                                </option>
+                            </select>
+                        </div>
                         <!-- Botón Buscar -->
                         <div class="col-md-12 text-end">
                             <button type="submit" class="btn btn-primary mt-3">
@@ -129,7 +153,7 @@
             </div>
         </div>
         <div class="table-container">
-            <table id="tablaFacturas" class="table table-striped">
+            <table id="tablaContratos" class="table table-striped">
                 <thead class="thead">
                     <tr>
                         <th class="th">Contrato</th>
@@ -143,7 +167,7 @@
                     </tr>
                 </thead>
                 <tbody class="tbody">
-                    <tr th:each="contrato : ${listaContratos}">
+                    <tr th:each="contrato : ${listaContratos}" th:class="${contrato.ClaveContrato}">
                         <td class="td" th:text="${contrato.ClaveContrato}"></td>
                         <td class="td" th:text="${contrato.Usuario.Nombre}"></td>
                         <td class="td" th:text="${contrato.NodoComercialRecepcion.ClaveNodo}"></td>
@@ -161,26 +185,49 @@
                 var filterContainer = document.getElementById("filterContainer");
                 filterContainer.classList.toggle("active");
             }
-            
-            $(document).ready(function(){
-               $("#formulario").submit(function (event){
-                  event.preventDefault();
-                  var datosFormulario = $(this).serialize();
-                  
-                  $.ajax({
-                     type: "POST",
-                     url: "http://localhost:8081/factura/byId/",
-                     data: datosFormulario,
-                     dataType: 'JSON',
-                     success: function (respuesta) {
-                        alert(respuesta.mensaje);
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                  });
-               });
+
+            $(document).ready(function () {
+                $('.js-example-basic-single').select2({
+                    width: '100%', // importante para que respete el diseño del contenedor
+                    placeholder: "Selecciona",
+                    allowClear: true
+                });
             });
+
+//            $(document).ready(function () {
+//                var $tabla = $("#tablaContratos");
+//                
+//                $("#inputContratos").change(function () {
+//                    var value = $(this).val();
+//
+//                    if (value) {
+//                        $('.tbody .tr' + value, $tabla).show();
+//                        $('tbody tr:not(.' + value + ')', $tabla).hide();
+//                    }else{
+//                        $('tbody tr', $tabla).show();
+//                    }
+//                });
+//            });
+
+//            $(document).ready(function(){
+//               $("#formulario").submit(function (event){
+//                  event.preventDefault();
+//                  var datosFormulario = $(this).serialize();
+//                  
+//                  $.ajax({
+//                     type: "POST",
+//                     url: "http://localhost:8081/factura/byId/",
+//                     data: datosFormulario,
+//                     dataType: 'JSON',
+//                     success: function (respuesta) {
+//                        alert(respuesta.mensaje);
+//                    },
+//                    error: function (error) {
+//                        console.log(error);
+//                    }
+//                  });
+//               });
+//            });
         </script>
     </body>
 </html>
