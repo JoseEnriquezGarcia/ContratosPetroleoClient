@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{Layout}">
+    <head>
+        <title>Zonas</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            .table-container {
+                overflow-x: auto;
+                margin: 21px;
+                border-radius: 8px;
+            }
+
+            .table {
+                border-collapse: collapse;
+                width: 100%;
+                table-layout: fixed; /* <-- importante: columnas de ancho fijo */
+            }
+
+            .th, .td {
+                padding: 8px 12px;
+                border: 1px solid #999;
+                text-align: center;
+                white-space: nowrap; /* evita saltos de línea */
+                overflow: hidden; /* oculta el desbordamiento */
+                text-overflow: ellipsis; /* pone "..." si el texto es muy largo */
+            }
+        </style>
+    </head>
+    <body layout:fragment="body">
+        <div class="container mt-5">
+            <h1 class="animate__animated animate__fadeIn text-center mt-5">Zonas</h1>
+            <div class="accordion mt-5 animate__animated animate__fadeIn" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Zonas de Extraccion
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="table-container">
+                                <table id="tablaContratos" class="table table-striped">
+                                    <thead class="thead">
+                                        <tr>
+                                            <th class="th">Nodo Recepción</th>
+                                            <th class="th">Descripción</th>
+                                            <th class="th">Zona Extracción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="tbody">
+                                        <tr th:each="zonaExtraccion : ${listaZonaExtraccion}">
+                                            <td class="td" th:text="${zonaExtraccion.ClaveNodo}"></td>
+                                            <td class="td" th:text="${zonaExtraccion.Descripcion}"></td>
+                                            <td class="td" th:text="${zonaExtraccion.Zona.ZonaClave}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Zonas de Inyeccion
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="table-container">
+                                <table id="tablaContratos" class="table table-striped">
+                                    <thead class="thead">
+                                        <tr>
+                                            <th class="th">Nodo Entrega</th>
+                                            <th class="th">Descripción</th>
+                                            <th class="th">Zona Inyección</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="tbody">
+                                        <tr th:each="zonaInyeccion : ${listaZonaInyeccion}">
+                                            <td class="td" th:text="${zonaInyeccion.ClaveNodo}"></td>
+                                            <td class="td" th:text="${zonaInyeccion.Descripcion}"></td>
+                                            <td class="td" th:text="${zonaInyeccion.Zona.ZonaClave}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -8,6 +8,7 @@ import com.JEnriquez.Crud.ML.Usuario;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,6 +59,7 @@ public class ContratosController {
             });
 
             model.addAttribute("contratoBusqueda", contratoBusqueda);
+            model.addAttribute("mostrarMensaje", false);
             model.addAttribute("listaContratos", response.getBody().objects);
             model.addAttribute("listaUsuarios", responseUsuario.getBody().objects);
             model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
@@ -73,16 +75,24 @@ public class ContratosController {
     @PostMapping("/busqueda")
     public String Busqueda(@ModelAttribute Contrato contrato, Model model) {
         try {
+            Result result = new Result();
             Contrato contratoBusqueda = new Contrato();
             contratoBusqueda.Usuario = new Usuario();
             contratoBusqueda.NodoComercialRecepcion = new NodoComercialRecepcion();
             contratoBusqueda.NodoComercialEntrega = new NodoComercialEntrega();
 
-            ResponseEntity<Result<Contrato>> response = restTemplate.exchange(URL_BASE + "/busquedaContratoService",
-                    HttpMethod.GET,
+            ResponseEntity<Result<Contrato>> response = restTemplate.exchange(URL_BASE + "contrato/busquedaContratoService",
+                    HttpMethod.POST,
                     new HttpEntity<>(contrato),
                     new ParameterizedTypeReference<Result<Contrato>>() {
             });
+
+            ResponseEntity<Result<Contrato>> responseContratos = restTemplate.exchange(URL_BASE + "contrato",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Contrato>>() {
+            });
+
             ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(URL_BASE + "usuario",
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
@@ -100,12 +110,24 @@ public class ContratosController {
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
-
-            model.addAttribute("contratoBusqueda", contratoBusqueda);
-            model.addAttribute("listaContratos", response.getBody().objects);
-            model.addAttribute("listaUsuarios", responseUsuario.getBody().objects);
-            model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
-            model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+            if (!response.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204))) {
+                result.objects = response.getBody().objects;
+                model.addAttribute("contratoBusqueda", contratoBusqueda);
+                model.addAttribute("mostrarMensaje", false);
+                model.addAttribute("listaContratos", result.objects);
+                model.addAttribute("listaContratosBusqueda", responseContratos.getBody().objects);
+                model.addAttribute("listaUsuarios", responseUsuario.getBody().objects);
+                model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
+                model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+            } else {
+                model.addAttribute("contratoBusqueda", contratoBusqueda);
+                model.addAttribute("mostrarMensaje", true);
+                model.addAttribute("listaContratos", result);
+                model.addAttribute("listaContratosBusqueda", responseContratos.getBody().objects);
+                model.addAttribute("listaUsuarios", responseUsuario.getBody().objects);
+                model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
+                model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+            }
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());

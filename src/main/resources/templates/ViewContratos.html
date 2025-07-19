@@ -5,9 +5,7 @@
         <title>Contratos</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <!--        <link rel="stylesheet" th:href="@{/css/style.css}">-->
         <style>
             .table-container {
                 overflow-x: auto;
@@ -61,8 +59,8 @@
         </style>
     </head>
     <body layout:fragment="body">
-        <h1 class="animate__animated animate__fadeInDown text-center mt-5">Contratos</h1>
-        <div class="container mt-5">
+        <h1 class="animate__animated animate__fadeIn text-center mt-5">Contratos</h1>
+        <div class="container mt-5 animate__animated animate__fadeIn">
             <button type="button" class="btn btn-toggle-filters" onclick="toggleFilters()">
                 <i class="bi bi-filter"></i> Buscar Contratos
             </button>
@@ -76,7 +74,7 @@
                             <label for="inputContratos" class="form-label">Contrato</label>
                             <select id="inputContratos" class="form-select js-example-basic-single w-100" th:field="*{ClaveContrato}">
                                 <option value="0" selected>Selecciona</option>
-                                <option th:each="contrato : ${listaContratos}"
+                                <option th:each="contrato : ${listaContratosBusqueda}"
                                         th:text="${contrato.ClaveContrato}"
                                         th:value="${contrato.ClaveContrato}">
                                 </option>
@@ -118,30 +116,30 @@
                                 </option>
                             </select>
                         </div>
+                        <!-- Zona Extraccion -->
+                        <div class="col-md-3">
+                            <label for="inputZonaExtraccion" class="form-label">Zona Extraccion</label>
+                            <select id="inputZonaExtraccion" class="form-select js-example-basic-single" th:field="*{NodoComercialRecepcion.Zona.ZonaClave}">
+                                <option value="0" selected>Selecciona</option>
+                                <option th:each="nodoRecepcion : ${listaNodoRecepcion}"
+                                        th:text="${nodoRecepcion.Zona.ZonaClave}"
+                                        th:value="${nodoRecepcion.Zona.ZonaClave}">
+                                </option>
+                            </select>
+                        </div>
 
                         <!-- Zona Inyeccion -->
                         <div class="col-md-3">
-                            <label for="inputZonaExtraccion" class="form-label">Zona Inyeccion</label>
-                            <select id="inputZonaExtraccion" class="form-select js-example-basic-single" th:field="*{NodoComercialEntrega.ClaveNodo.Zona.ZonaClave}">
+                            <label for="inputZonaInyeccion" class="form-label">Zona Inyeccion</label>
+                            <select id="inputZonaInyeccion" class="form-select js-example-basic-single" th:field="*{NodoComercialEntrega.Zona.ZonaClave}">
                                 <option value="0" selected>Selecciona</option>
-                                <option th:each="nodoRecepcion : ${listaNodoRecepcion}"
-                                        th:text="${nodoRecepcion.ClaveNodo.Zona.ZonaClave}"
-                                        th:value="${nodoRecepcion.ClaveNodo.Zona.ZonaClave}">
+                                <option th:each="nodoEntrega : ${listaNodoEntrega}"
+                                        th:text="${nodoEntrega.Zona.ZonaClave}"
+                                        th:value="${nodoEntrega.Zona.ZonaClave}">
                                 </option>
                             </select>
                         </div>
 
-                        <!-- Zona Extraccion -->
-                        <div class="col-md-3">
-                            <label for="inputZonaInyeccion" class="form-label">Zona Extraccion</label>
-                            <select id="inputZonaInyeccion" class="form-select js-example-basic-single" th:field="*{NodoComercialEntrega.ClaveNodo.Zona.ZonaClave}">
-                                <option value="0" selected>Selecciona</option>
-                                <option th:each="nodoRecepcion : ${listaNodoEntrega}"
-                                        th:text="${nodoRecepcion.ClaveNodo.Zona.ZonaClave}"
-                                        th:value="${nodoEntrega.ClaveNodo.Zona.ZonaClave}">
-                                </option>
-                            </select>
-                        </div>
                         <!-- Botón Buscar -->
                         <div class="col-md-12 text-end">
                             <button type="submit" class="btn btn-primary mt-3">
@@ -152,8 +150,12 @@
                 </form>
             </div>
         </div>
-        <div class="table-container">
-            <table id="tablaContratos" class="table table-striped">
+        
+        <h5 class="animate__animated animate__fadeIn text-center" th:if="${mostrarMensaje == true}">Sin resultados en la busqueda...</h5>
+        <p class="animate__animated animate__fadeIn text-center" th:if="${mostrarMensaje == true}">Intenta con otra busqueda.</p>
+        
+        <div class="table-container animate__animated animate__fadeIn">
+            <table id="tablaContratos" class="table table-striped" th:if="${mostrarMensaje == false}">
                 <thead class="thead">
                     <tr>
                         <th class="th">Contrato</th>
