@@ -6,7 +6,6 @@ import com.JEnriquez.Crud.ML.NodoComercialEntrega;
 import com.JEnriquez.Crud.ML.NodoComercialRecepcion;
 import com.JEnriquez.Crud.ML.Result;
 import com.JEnriquez.Crud.ML.Usuario;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -81,11 +80,14 @@ public class FacturasController {
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
-
-            result.objects = response.getBody().objects.stream()
-                    .sorted(Comparator.comparing(f -> f.getIdFactura()))
-                    .collect(Collectors.toList());
+            ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
+                    HttpMethod.GET,
+                    response,
+                    new ParameterizedTypeReference<Result>() {
+                    });
             result.currentPage = response.getBody().currentPage;
+            
+            
 
             model.addAttribute("facturaBusqueda", facturaBusqueda);
             model.addAttribute("numeroPagina", paginaActual);
@@ -93,12 +95,12 @@ public class FacturasController {
             model.addAttribute("paginas", paginas);
             model.addAttribute("mostrarMensaje", false);
             model.addAttribute("mostrarPaginacion", true);
-            model.addAttribute("listaFacturas", result.objects);
+            model.addAttribute("listaFacturas", response.getBody().objects);
             model.addAttribute("listaContratos", responseContrato.getBody().objects);
             model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
             model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
             model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
-
+            model.addAttribute("fechas", responseFechaMaxMin.getBody().objects);
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
@@ -153,7 +155,13 @@ public class FacturasController {
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
-
+            
+            ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
+                    HttpMethod.GET,
+                    response,
+                    new ParameterizedTypeReference<Result>() {
+                    });
+            
             if (response.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204))) {
                 model.addAttribute("facturaBusqueda", facturaBusqueda);
                 model.addAttribute("numeroPagina", paginaActual);
@@ -166,6 +174,7 @@ public class FacturasController {
                 model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
                 model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
                 model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+                model.addAttribute("fechas", responseFechaMaxMin.getBody().objects);
             } else if (response.getStatusCode().is2xxSuccessful()) {
                 result.objects = response.getBody().objects;
                 model.addAttribute("facturaBusqueda", facturaBusqueda);
@@ -179,6 +188,7 @@ public class FacturasController {
                 model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
                 model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
                 model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+                model.addAttribute("fechas", responseFechaMaxMin.getBody().objects);
             }
 
         } catch (HttpStatusCodeException ex) {
@@ -227,6 +237,12 @@ public class FacturasController {
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
+            
+            ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
+                    HttpMethod.GET,
+                    response,
+                    new ParameterizedTypeReference<Result>() {
+                    });
 
             result.objects = response.getBody().objects;
 
@@ -238,7 +254,7 @@ public class FacturasController {
             model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
             model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
             model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
-
+            model.addAttribute("fechas", responseFechaMaxMin.getBody().objects);
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
@@ -247,5 +263,12 @@ public class FacturasController {
 
         return "ViewFacturas";
     }
-
+    
+    @GetMapping("/formFactura")
+    public String FormFactura(){
+        
+        
+        
+        return "FormularioFactura";
+    }
 }
