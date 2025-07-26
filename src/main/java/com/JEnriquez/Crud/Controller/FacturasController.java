@@ -34,6 +34,9 @@ public class FacturasController {
     @GetMapping
     public String GetAll(@RequestParam(defaultValue = "0") int currentPage, Model model) {
         try {
+            Factura factura = new Factura();
+            factura.Contrato = new Contrato();
+            
             Factura facturaBusqueda = new Factura();
             facturaBusqueda.Contrato = new Contrato();
             facturaBusqueda.Contrato.Usuario = new Usuario();
@@ -84,12 +87,11 @@ public class FacturasController {
                     HttpMethod.GET,
                     response,
                     new ParameterizedTypeReference<Result>() {
-                    });
+            });
             result.currentPage = response.getBody().currentPage;
-            
-            
 
             model.addAttribute("facturaBusqueda", facturaBusqueda);
+            model.addAttribute("factura", factura);
             model.addAttribute("numeroPagina", paginaActual);
             model.addAttribute("totalPaginas", totalPaginas);
             model.addAttribute("paginas", paginas);
@@ -102,7 +104,8 @@ public class FacturasController {
             model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
             model.addAttribute("fechas", responseFechaMaxMin.getBody().objects);
         } catch (HttpStatusCodeException ex) {
-            model.addAttribute("status", ex.getStatusCode());
+            model.addAttribute("status", ex.getStatusCode().value());
+            model.addAttribute("statusText", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
             return "ErrorPage";
         }
@@ -155,13 +158,13 @@ public class FacturasController {
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
-            
+
             ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
                     HttpMethod.GET,
                     response,
                     new ParameterizedTypeReference<Result>() {
-                    });
-            
+            });
+
             if (response.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204))) {
                 model.addAttribute("facturaBusqueda", facturaBusqueda);
                 model.addAttribute("numeroPagina", paginaActual);
@@ -192,7 +195,8 @@ public class FacturasController {
             }
 
         } catch (HttpStatusCodeException ex) {
-            model.addAttribute("status", ex.getStatusCode());
+            model.addAttribute("status", ex.getStatusCode().value());
+            model.addAttribute("statusText", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
             return "ErrorPage";
         }
@@ -237,12 +241,12 @@ public class FacturasController {
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
-            
+
             ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
                     HttpMethod.GET,
                     response,
                     new ParameterizedTypeReference<Result>() {
-                    });
+            });
 
             result.objects = response.getBody().objects;
 
@@ -256,19 +260,31 @@ public class FacturasController {
             model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
             model.addAttribute("fechas", responseFechaMaxMin.getBody().objects);
         } catch (HttpStatusCodeException ex) {
-            model.addAttribute("status", ex.getStatusCode());
+            model.addAttribute("status", ex.getStatusCode().value());
+            model.addAttribute("statusText", ex.getStatusCode());
             model.addAttribute("message", ex.getMessage());
             return "ErrorPage";
         }
 
         return "ViewFacturas";
     }
-    
-    @GetMapping("/formFactura")
-    public String FormFactura(){
-        
-        
-        
-        return "FormularioFactura";
+
+    @PostMapping("/addFactura")
+    public String Add(@ModelAttribute Factura factura, Model model) {
+
+        try {
+            ResponseEntity<Result> response = restTemplate.exchange(URL_BASE + "factura/add",
+                    HttpMethod.POST,
+                    new HttpEntity<>(factura),
+                    new ParameterizedTypeReference<Result>() {
+            });
+
+        } catch (HttpStatusCodeException ex) {
+            model.addAttribute("status", ex.getStatusCode().value());
+            model.addAttribute("statusText", ex.getStatusCode());
+            model.addAttribute("message", ex.getMessage());
+            return "ErrorPage";
+        }
+        return "redirect:/facturas";
     }
 }

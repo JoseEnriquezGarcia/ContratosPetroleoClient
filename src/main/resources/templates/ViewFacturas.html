@@ -132,7 +132,7 @@
         <div class="container mt-5 animate__animated animate__fadeIn">
 
             <a type="button" data-bs-toggle="modal" data-bs-target="#formModal" class="btn btn-toggle-filters" onclick="openModalForm()">
-                <i class="bi bi-filter"></i> Agregar Facturas
+                <i class="bi bi-plus"></i> Agregar Facturas
             </a>
 
             <button type="button" class="btn btn-toggle-filters" onclick="toggleFilters()">
@@ -290,7 +290,7 @@
             </table>
         </div>
         <!-- Modal -->
-        <div class="modal fade animate__animated animate__flipInX" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade animate__animated" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -331,79 +331,88 @@
         </div>
 
         <!-- ModalForm -->
-        <div class="modal modalForm fade" id="formModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
+        <div class="modal fade modalForm animate__animated" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content shadow-sm rounded-4">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Nueva Factura</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title" id="formModalLabel">Nueva Factura</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" onclick="closeModal()"></button>
                     </div>
+
                     <div class="modal-body">
-                        <form class="row justify-content-center g-3">
+                        <form class="row g-4" th:action="@{/facturas/addFactura}" method="post" th:object="${factura}">
+
                             <div class="col-md-6">
-                                <label for="idContrato" class="form-label">Id Contrato</label>
-                                <input type="text" class="form-control" id="idContrato">
+                                <label for="fecha" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="fechaFactura" th:field="*{fecha}" required>
                             </div>
+
                             <div class="col-md-6">
-                                <label for="inputPassword4" class="form-label">Fecha</label>
-                                <input type="password" class="form-control" id="inputPassword4">
-                            </div>
-                            <div class="col-12">
-                                <label for="inputAddress" class="form-label">Cantidad nominada recepción</label>
-                                <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
-                            </div>
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Cantidad asignada recepción</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                                <label for="inputContrato" class="form-label">Contrato</label>
+                                <select id="inputContrato" class="form-select js-example-basic-single w-100" th:field="*{Contrato.IdContrato}" required>
+                                    <option value=0 selected>Selecciona</option>
+                                    <option th:each="contrato : ${listaContratos}"
+                                            th:text="${contrato.ClaveContrato}"
+                                            th:value="${contrato.IdContrato}">
+                                    </option>
+                                </select>
                             </div>
 
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Cantidad nominada entrega</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                            <div class="col-md-6">
+                                <label for="cantidadNomRec" class="form-label">Cantidad Nominada Recepción</label>
+                                <input type="number" class="form-control" id="cantidadNomRec" placeholder="Ej. 1500" th:field="*{NominadaRecepcion}" required>
                             </div>
 
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Cantidad asignada entrega</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                            <div class="col-md-6">
+                                <label for="cantidadAsigRec" class="form-label">Cantidad Asignada Recepción</label>
+                                <input type="number" class="form-control" id="cantidadAsigRec" placeholder="Ej. 1450" th:field=*{AsignadaRecepcion} required>
                             </div>
 
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Tarifa exceso firme</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                            <div class="col-md-6">
+                                <label for="cantidadNomEnt" class="form-label">Cantidad Nominada Entrega</label>
+                                <input type="number" class="form-control" id="cantidadNomEnt" placeholder="Ej. 1500" th:field="*{NominadaEntrega}" required>
                             </div>
 
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Tarifa uso interrumpible</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                            <div class="col-md-6">
+                                <label for="cantidadAsigEnt" class="form-label">Cantidad Asignada Entrega</label>
+                                <input type="number" class="form-control" id="cantidadAsigEnt" placeholder="Ej. 1470" th:field="*{AsignadaEntrega}" required>
                             </div>
 
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Gas exceso</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                            <div class="col-md-6">
+                                <label for="tarifaFirme" class="form-label">Tarifa Exceso Firme</label>
+                                <input type="text" class="form-control" id="tarifaFirme" placeholder="$0.00" th:field="*{ExcesoFirme}" required>
                             </div>
 
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Cargo uso</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                            <div class="col-md-6">
+                                <label for="tarifaInter" class="form-label">Tarifa Uso Interrumpible</label>
+                                <input type="text" class="form-control" id="tarifaInter" placeholder="$0.00" th:field="*{UsoInterrumpible}" required>
                             </div>
 
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Cargo gas exceso</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                            <div class="col-md-6">
+                                <label for="gasExceso" class="form-label">Gas Exceso</label>
+                                <input type="number" class="form-control" id="gasExceso" placeholder="Ej. 120" th:field="*{GasExceso}" required>
                             </div>
 
-                            <div class="col-12">
-                                <label for="inputAddress2" class="form-label">Total factura</label>
-                                <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                            <div class="col-md-6">
+                                <label for="cargoUso" class="form-label">Cargo Uso</label>
+                                <input type="text" class="form-control" id="cargoUso" placeholder="$0.00" th:field="*{CargoUso}" required>
                             </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary">Sign in</button>
+
+                            <div class="col-md-6">
+                                <label for="cargoGasExceso" class="form-label">Cargo Gas Exceso</label>
+                                <input type="text" class="form-control" id="cargoGasExceso" placeholder="$0.00" th:field="*{CargoGasExceso}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="totalFactura" class="form-label">Total Factura</label>
+                                <input type="text" class="form-control" id="totalFactura" placeholder="$0.00" th:field="*{TotalFactura}" required>
+                            </div>
+
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary">Guardar Factura</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeModal()">Cancelar</button>
                             </div>
                         </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Send message</button>
                     </div>
                 </div>
             </div>
@@ -449,24 +458,26 @@
             const myModal = document.getElementById('myModal');
             const myInput = document.getElementById('myInput');
 
-//            myModal.addEventListener('shown.bs.modal', () => {
-//                myInput.focus();
-//            });
             function openModal() {
                 const container = $('.modal');
                 container.removeClass('animate__zoomOut').addClass('animate__zoomIn');
             }
-
-            function openModalForm() {
-                const container = $('.modalForm');
-                container.removeClass('animate__zoomOut').addClass('animate__zoomIn');
-            }
-
+            
             function closeModal() {
                 const container = $('.modal');
                 container.removeClass('animate__zoomIn').addClass('animate__zoomOut');
             }
-
+            
+            function openModalForm() {
+                const container = $('.modalForm');
+                container.removeClass('animate__zoomOut').addClass('animate__zoomIn');
+            }
+            
+            function closeModalForm() {
+                const container = $('.modalForm');
+                container.removeClass('animate__zoomIn').addClass('animate__zoomOut');
+            }
+            
             function toggleFilters() {
                 var filterContainer = document.getElementById("filterContainer");
                 filterContainer.classList.toggle("active");
@@ -520,10 +531,37 @@
             }
 
             $(document).ready(function () {
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+
+                today = yyyy + '-' + mm + '-' + dd;
+                document.getElementById("fechaFactura").setAttribute("max", today);
+                
                 $('.js-example-basic-single').select2({
-                    width: '100%', // importante para que respete el diseño del contenedor
+                    width: '100%',
                     placeholder: "Selecciona",
+                    theme: 'bootstrap-5',
                     allowClear: true
+                });
+            });
+
+            $(document).ready(function () {
+                $('#formModal').on('shown.bs.modal', function () {
+                    $('#inputContrato').select2({
+                        dropdownParent: $('#formModal'),
+                        width: '100%',
+                        placeholder: "Selecciona",
+                        theme: 'bootstrap-5',
+                        allowClear: true
+                    });
                 });
             });
 

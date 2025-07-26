@@ -3,6 +3,7 @@ package com.JEnriquez.Crud.ML;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter @Setter
 public class Factura {
@@ -11,6 +12,7 @@ public class Factura {
     
     public Contrato Contrato;
     
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date Fecha;
     
     private double NominadaRecepcion;
