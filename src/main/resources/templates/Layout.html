@@ -31,13 +31,13 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" th:href="@{/facturas}">Facturas</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" th:if="${rol == 'administrador'}">
                         <a class="nav-link active" aria-current="page" th:href="@{/contratos}">Contratos</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" th:if="${rol == 'administrador'}">
                         <a class="nav-link active" aria-current="page" th:href="@{/usuario}">Usuarios</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" th:if="${rol == 'administrador'}">
                         <a class="nav-link active" aria-current="page" th:href="@{/zonas}">Zonas</a>
                     </li>
                 </ul>

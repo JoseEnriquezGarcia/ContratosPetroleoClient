@@ -3,7 +3,6 @@ package com.JEnriquez.Crud.Controller;
 import com.JEnriquez.Crud.ML.ResultToken;
 import com.JEnriquez.Crud.ML.Usuario;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -24,7 +23,7 @@ public class LoginController {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String URL_BASE = "http://localhost:8081/";
 
-    @GetMapping("/loginPage")
+    @GetMapping("/login")
     public String LoginPage(Model model) {
         Usuario usuario = new Usuario();
 
@@ -43,6 +42,8 @@ public class LoginController {
                     new ParameterizedTypeReference<ResultToken>() {
             });
             
+            session.setAttribute("username", usuario.getUsername());
+            session.setAttribute("rol", response.getBody().rol);
             session.setAttribute("bearer", response.getBody().Bearer);
         } catch (HttpStatusCodeException ex) {
             model.addAttribute("status", ex.getStatusCode().value());
@@ -50,7 +51,6 @@ public class LoginController {
             model.addAttribute("message", ex.getMessage());
             return "ErrorPage";
         }
-        
         return "redirect:/inicio";
     }
 }

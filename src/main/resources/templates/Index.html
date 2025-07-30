@@ -13,7 +13,7 @@
     </head>
     <body class="container">
         <div class="row justify-content-center animate__animated animate__fadeIn">
-            <h1 class="mt-5 text-center">¡Hola Usuario!</h1>
+            <h1 class="mt-5 text-center" th:text="'¡Hola '+ ${username} + '!'"> Usuario</h1>
         </div>
         <div class="row justify-content-center mt-5 animate__animated animate__fadeIn">
             <div class="col-6 mb-5">
@@ -22,11 +22,11 @@
                     <div class="card-body">
                         <h5 class="card-title">Facturas</h5>
                         <p class="card-text">Visualiza cada una de las facturas que se encuentran registradas</p>
-                        <a href="/facturas" class="stretched-link"></a>
+                        <a href="/facturas/GetByUsername" class="stretched-link"></a>
                     </div>
                 </div>
 
-                <div class="card" style="width: 18rem;">
+                <div class="card" style="width: 18rem;" th:if="${rol == 'administrador'}">
                     <img src="https://i.postimg.cc/prZXNyZL/firma-contrato-sms.png" class="card-img-top" style="height: 300px;" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">Contratos</h5>
@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="col-2">
-                <div class="card mb-5" style="width: 18rem;">
+                <div class="card mb-5" style="width: 18rem;" th:if="${rol == 'administrador'}">
                     <img src="https://i.postimg.cc/BbQfKpTJ/drex-usuarios-y-perfiles-custom.png" class="card-img-top" style="height: 200px;" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">Provedores</h5>
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <div class="card" style="width: 18rem;">
+                <div class="card" style="width: 18rem;" th:if="${rol == 'administrador'}">
                     <img src="https://i.postimg.cc/BZwVpJsT/petroleo-Extraccion.jpg" class="card-img-top" style="height: 300px;" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">Zonas</h5>

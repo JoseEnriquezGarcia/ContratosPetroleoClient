@@ -10,4 +10,7 @@ public class Result<T> {
     public T object;
     public List<T> objects;
     public int currentPage;
+    public int statusCode;
+    public int totalPages;
+    public long totalElementos;
 }

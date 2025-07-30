@@ -38,7 +38,7 @@ public class FacturasController {
         try {
             Factura factura = new Factura();
             factura.Contrato = new Contrato();
-            
+
             Factura facturaBusqueda = new Factura();
             facturaBusqueda.Contrato = new Contrato();
             facturaBusqueda.Contrato.Usuario = new Usuario();
@@ -55,12 +55,12 @@ public class FacturasController {
 
 // Generar lista de páginas visibles
             List<Integer> paginas = IntStream.rangeClosed(desde, hasta).boxed().collect(Collectors.toList());
-            
+
             String token = session.getAttribute("bearer").toString();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(token);
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            
+
             ResponseEntity<Result<Factura>> response = restTemplate.exchange(URL_BASE + "factura?numeroPagina=" + currentPage,
                     HttpMethod.GET,
                     entity,
@@ -119,6 +119,92 @@ public class FacturasController {
         return "ViewFacturas";
     }
 
+    @GetMapping("/GetByUsername")
+    public String GetAllByName(@RequestParam(defaultValue = "0") int currentPage, Model model, HttpSession session) {
+        try {
+            Factura factura = new Factura();
+            factura.Contrato = new Contrato();
+
+            Factura facturaBusqueda = new Factura();
+            facturaBusqueda.Contrato = new Contrato();
+            facturaBusqueda.Contrato.Usuario = new Usuario();
+            Result result = new Result();
+
+            int paginaActual = currentPage;
+
+            String token = session.getAttribute("bearer").toString();
+            String username = session.getAttribute("username").toString();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Result<Factura>> response = restTemplate.exchange(URL_BASE + "factura/GetByUsername?numeroPagina=" + currentPage + "&Username=" + username,
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<Result<Factura>>() {
+            });
+
+            int totalPaginas = response.getBody().totalPages;
+            int desde = Math.max(0, paginaActual - 1);
+            int hasta = Math.min(desde + 4, totalPaginas - 1);
+            if (hasta - desde < 4) {
+                desde = Math.max(0, hasta - 4);
+            }
+            List<Integer> paginas = IntStream.rangeClosed(desde, hasta).boxed().collect(Collectors.toList());
+            
+            ResponseEntity<Result<Contrato>> responseContrato = restTemplate.exchange(URL_BASE + "contrato",
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<Result<Contrato>>() {
+            });
+
+            ResponseEntity<Result<Usuario>> responseUsuarios = restTemplate.exchange(URL_BASE + "usuario",
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<Result<Usuario>>() {
+            });
+
+            ResponseEntity<Result<NodoComercialRecepcion>> responseNodoRecepcion = restTemplate.exchange(URL_BASE + "nodoRecepcion",
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<Result<NodoComercialRecepcion>>() {
+            });
+
+            ResponseEntity<Result<NodoComercialEntrega>> responseNodoEntrega = restTemplate.exchange(URL_BASE + "nodoEntrega",
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
+            });
+            ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<Result>() {
+            });
+            result.currentPage = response.getBody().currentPage;
+
+            model.addAttribute("facturaBusqueda", facturaBusqueda);
+            model.addAttribute("factura", factura);
+            model.addAttribute("numeroPagina", paginaActual);
+            model.addAttribute("totalPaginas", totalPaginas);
+            model.addAttribute("paginas", paginas);
+            model.addAttribute("mostrarMensaje", false);
+            model.addAttribute("mostrarPaginacion", false);
+            model.addAttribute("mostrarPaginacionByName", true);
+            model.addAttribute("listaFacturas", response.getBody().objects);
+            model.addAttribute("listaContratos", responseContrato.getBody().objects);
+            model.addAttribute("listaUsuarios", responseUsuarios.getBody().objects);
+            model.addAttribute("listaNodoRecepcion", responseNodoRecepcion.getBody().objects);
+            model.addAttribute("listaNodoEntrega", responseNodoEntrega.getBody().objects);
+            model.addAttribute("fechas", responseFechaMaxMin.getBody().objects);
+        } catch (HttpStatusCodeException ex) {
+            model.addAttribute("status", ex.getStatusCode().value());
+            model.addAttribute("statusText", ex.getStatusCode());
+            model.addAttribute("message", ex.getMessage());
+            return "ErrorPage";
+        }
+        return "ViewFacturas";
+    }
+
     @PostMapping("/busqueda")
     public String BusquedaDinamica(@ModelAttribute Factura factura, Model model, HttpSession session) {
         try {
@@ -135,12 +221,12 @@ public class FacturasController {
             facturaBusqueda.Contrato = new Contrato();
             facturaBusqueda.Contrato.Usuario = new Usuario();
             Result result = new Result();
-            
+
             String token = session.getAttribute("bearer").toString();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(token);
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            
+
             ResponseEntity<Result<Factura>> response = restTemplate.exchange(URL_BASE + "factura/busquedaService",
                     HttpMethod.POST,
                     entity,
@@ -224,12 +310,12 @@ public class FacturasController {
             facturaBusqueda.Contrato = new Contrato();
             facturaBusqueda.Contrato.Usuario = new Usuario();
             Result result = new Result();
-            
+
             String token = session.getAttribute("bearer").toString();
             HttpHeaders header = new HttpHeaders();
             header.setBearerAuth(token);
             HttpEntity<String> entity = new HttpEntity<>(header);
-            
+
             ResponseEntity<Result<Factura>> response = restTemplate.exchange(URL_BASE + "factura/getByFecha?Desde=" + Desde + "&Hasta=" + Hasta,
                     HttpMethod.GET,
                     entity,
