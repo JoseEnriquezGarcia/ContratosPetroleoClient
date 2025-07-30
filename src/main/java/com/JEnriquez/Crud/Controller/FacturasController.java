@@ -6,11 +6,13 @@ import com.JEnriquez.Crud.ML.NodoComercialEntrega;
 import com.JEnriquez.Crud.ML.NodoComercialRecepcion;
 import com.JEnriquez.Crud.ML.Result;
 import com.JEnriquez.Crud.ML.Usuario;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,7 @@ public class FacturasController {
     private final String URL_BASE = "http://localhost:8081/";
 
     @GetMapping
-    public String GetAll(@RequestParam(defaultValue = "0") int currentPage, Model model) {
+    public String GetAll(@RequestParam(defaultValue = "0") int currentPage, Model model, HttpSession session) {
         try {
             Factura factura = new Factura();
             factura.Contrato = new Contrato();
@@ -53,39 +55,44 @@ public class FacturasController {
 
 // Generar lista de páginas visibles
             List<Integer> paginas = IntStream.rangeClosed(desde, hasta).boxed().collect(Collectors.toList());
-
+            
+            String token = session.getAttribute("bearer").toString();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            
             ResponseEntity<Result<Factura>> response = restTemplate.exchange(URL_BASE + "factura?numeroPagina=" + currentPage,
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Factura>>() {
             });
 
             ResponseEntity<Result<Contrato>> responseContrato = restTemplate.exchange(URL_BASE + "contrato",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Contrato>>() {
             });
 
             ResponseEntity<Result<Usuario>> responseUsuarios = restTemplate.exchange(URL_BASE + "usuario",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Usuario>>() {
             });
 
             ResponseEntity<Result<NodoComercialRecepcion>> responseNodoRecepcion = restTemplate.exchange(URL_BASE + "nodoRecepcion",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<NodoComercialRecepcion>>() {
             });
 
             ResponseEntity<Result<NodoComercialEntrega>> responseNodoEntrega = restTemplate.exchange(URL_BASE + "nodoEntrega",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
             ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
                     HttpMethod.GET,
-                    response,
+                    entity,
                     new ParameterizedTypeReference<Result>() {
             });
             result.currentPage = response.getBody().currentPage;
@@ -113,7 +120,7 @@ public class FacturasController {
     }
 
     @PostMapping("/busqueda")
-    public String BusquedaDinamica(@ModelAttribute Factura factura, Model model) {
+    public String BusquedaDinamica(@ModelAttribute Factura factura, Model model, HttpSession session) {
         try {
             int totalPaginas = 67;
             int paginaActual = 0;
@@ -128,40 +135,45 @@ public class FacturasController {
             facturaBusqueda.Contrato = new Contrato();
             facturaBusqueda.Contrato.Usuario = new Usuario();
             Result result = new Result();
-
+            
+            String token = session.getAttribute("bearer").toString();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            
             ResponseEntity<Result<Factura>> response = restTemplate.exchange(URL_BASE + "factura/busquedaService",
                     HttpMethod.POST,
-                    new HttpEntity<>(factura),
+                    entity,
                     new ParameterizedTypeReference<Result<Factura>>() {
             });
 
             ResponseEntity<Result<Contrato>> responseContrato = restTemplate.exchange(URL_BASE + "contrato",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Contrato>>() {
             });
 
             ResponseEntity<Result<Usuario>> responseUsuarios = restTemplate.exchange(URL_BASE + "usuario",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Usuario>>() {
             });
 
             ResponseEntity<Result<NodoComercialRecepcion>> responseNodoRecepcion = restTemplate.exchange(URL_BASE + "nodoRecepcion",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<NodoComercialRecepcion>>() {
             });
 
             ResponseEntity<Result<NodoComercialEntrega>> responseNodoEntrega = restTemplate.exchange(URL_BASE + "nodoEntrega",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
 
             ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
                     HttpMethod.GET,
-                    response,
+                    entity,
                     new ParameterizedTypeReference<Result>() {
             });
 
@@ -205,46 +217,52 @@ public class FacturasController {
     }
 
     @GetMapping("/byFecha")
-    public String BusquedaByFecha(@RequestParam String Desde, @RequestParam String Hasta, Model model) {
+    public String BusquedaByFecha(@RequestParam String Desde, @RequestParam String Hasta, Model model, HttpSession session) {
 
         try {
             Factura facturaBusqueda = new Factura();
             facturaBusqueda.Contrato = new Contrato();
             facturaBusqueda.Contrato.Usuario = new Usuario();
             Result result = new Result();
+            
+            String token = session.getAttribute("bearer").toString();
+            HttpHeaders header = new HttpHeaders();
+            header.setBearerAuth(token);
+            HttpEntity<String> entity = new HttpEntity<>(header);
+            
             ResponseEntity<Result<Factura>> response = restTemplate.exchange(URL_BASE + "factura/getByFecha?Desde=" + Desde + "&Hasta=" + Hasta,
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Factura>>() {
             });
 
             ResponseEntity<Result<Contrato>> responseContrato = restTemplate.exchange(URL_BASE + "contrato",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Contrato>>() {
             });
 
             ResponseEntity<Result<Usuario>> responseUsuarios = restTemplate.exchange(URL_BASE + "usuario",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<Usuario>>() {
             });
 
             ResponseEntity<Result<NodoComercialRecepcion>> responseNodoRecepcion = restTemplate.exchange(URL_BASE + "nodoRecepcion",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<NodoComercialRecepcion>>() {
             });
 
             ResponseEntity<Result<NodoComercialEntrega>> responseNodoEntrega = restTemplate.exchange(URL_BASE + "nodoEntrega",
                     HttpMethod.GET,
-                    HttpEntity.EMPTY,
+                    entity,
                     new ParameterizedTypeReference<Result<NodoComercialEntrega>>() {
             });
 
             ResponseEntity<Result> responseFechaMaxMin = restTemplate.exchange(URL_BASE + "factura/fecha",
                     HttpMethod.GET,
-                    response,
+                    entity,
                     new ParameterizedTypeReference<Result>() {
             });
 
